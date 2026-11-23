@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 
 function App() {
@@ -9,7 +8,8 @@ function App() {
 
   // Calculate product price
   const calculatePrice = (product) => {
-    return product.price + product.price * 0.1;
+    const discount = product.price * 0.05;
+    return product.price - discount;
   };
 
   // Update product
@@ -17,9 +17,12 @@ function App() {
     setProducts((previous) =>
       previous.map((product) =>
         product.id === id
-          ? { ...product, stock: product.stock - quantity }
-          : product
-      )
+          ? {
+              ...product,
+              stock: Math.max(0, product.stock - quantity),
+            }
+          : product,
+      ),
     );
   };
 
@@ -28,10 +31,14 @@ function App() {
     const totalProducts = products.length;
     const totalStock = products.reduce(
       (total, product) => total + product.stock,
-      0
+      0,
+    );
+    const totalValue = products.reduce(
+      (total, product) => total + product.price * product.stock,
+      0,
     );
 
-    return { totalProducts, totalStock };
+    return { totalProducts, totalStock, totalValue };
   };
 
   const report = generateReport();
@@ -48,9 +55,8 @@ function App() {
           <h3>{product.name}</h3>
           <p>Price: ₹{calculatePrice(product)}</p>
           <p>Stock: {product.stock}</p>
-          <button onClick={() => updateProduct(product.id, 1)}>
-            Sell One
-          </button>
+          <p>Total Inventory Value: ₹{report.totalValue}</p>
+          <button onClick={() => updateProduct(product.id, 1)}>Sell One</button>
         </div>
       ))}
     </div>
