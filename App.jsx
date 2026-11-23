@@ -8,8 +8,10 @@ function App() {
 
   // Calculate product price
   const calculatePrice = (product) => {
+    const tax = product.price * 0.18;
     const discount = product.price * 0.05;
-    return product.price - discount;
+
+    return (product.price + tax) - discount;
   };
 
   // Update product
@@ -18,8 +20,11 @@ function App() {
       previous.map((product) =>
         product.id === id
           ? {
+             
               ...product,
+             
               stock: Math.max(0, product.stock - quantity),
+              sold: (product.sold || 0) + quantity,
             }
           : product,
       ),
@@ -38,7 +43,7 @@ function App() {
       0,
     );
 
-    return { totalProducts, totalStock, totalValue };
+    return { totalProducts, totalStock, lowStock, totalValue };
   };
 
   const report = generateReport();
@@ -55,6 +60,7 @@ function App() {
           <h3>{product.name}</h3>
           <p>Price: ₹{calculatePrice(product)}</p>
           <p>Stock: {product.stock}</p>
+          <p>Low Stock Products: {report.lowStock}</p>
           <p>Total Inventory Value: ₹{report.totalValue}</p>
           <button onClick={() => updateProduct(product.id, 1)}>Sell One</button>
         </div>
